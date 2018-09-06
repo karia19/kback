@@ -94,10 +94,10 @@ app.delete('/api/delete/:id', (req, res) => {
 
 
 
-const port = process.env.port ||  3001;
+const PORT = process.env.PORT ||  3001;
 
 app.listen(port, () => {
-    console.log(`server running in ${port}`)
+    console.log(`server running in ${PORT}`)
 })
 
 
