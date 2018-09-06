@@ -6,6 +6,7 @@ const cors = require('cors');
 
 app.use(bodyParse.json());
 app.use(cors())
+app.use(express.static('build'))
 morgan('tiny');
 app.use(morgan('tiny'))
 
