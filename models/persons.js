@@ -1,10 +1,13 @@
 const mongoose = require('mongoose')
 
+require('dotenv').config()
+/*
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config()
   }
   
-  const url = process.env.MONGODB_URI
+*/  
+const url = process.env.MONGODB_URI
 
 mongoose.connect(url)
 
