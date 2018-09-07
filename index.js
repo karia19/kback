@@ -3,6 +3,7 @@ const bodyParse = require('body-parser');
 const app = express();
 //const morgan = require('morgan')
 const cors = require('cors');
+const Persons = require('./models/persons')
 
 app.use(bodyParse.json());
 app.use(cors())
@@ -41,13 +42,43 @@ let persons =
       
     ]
   
-
+const format = (note) => {
+    return{
+        name: note.name,
+        number: note.number,
+        id: note._id
+    }
+}
 
 app.get('/api/persons', (req, res) => {
-    res.json(persons)
+    Persons
+       .find({})
+       .then(p => {
+           res.json(p.map(format))
+       })
+    //res.json(persons)
 })
 
 app.post('/api/persons', (req, res) => {
+    
+    const uusi = req.body;
+
+    const persons = new Persons ({
+        name: uusi.name,
+        number: uusi.number
+    })
+
+    persons
+       .save()
+       .catch(error => {
+           console.log(error)
+           res.status(404).end()
+       })
+       .then(savedP => {
+           res.json(format(savedP))
+    })
+    
+    /*
     const generId = Math.floor((Math.random()* 1000) + 1)    
 
     const uusi = req.body;
@@ -66,6 +97,26 @@ app.post('/api/persons', (req, res) => {
 
     persons = persons.concat(person)
     res.json(person)
+    */
+app.put('/api/persons/:id', (req, res) => {
+    const body = req.body
+    console.log(body)
+
+    const update = {
+        name: body.name,
+        number: body.number
+    }
+    Persons
+      .findByIdAndUpdate(req.params.id, update)
+      .then(x => {
+          res.json(format(x))
+      })
+      .catch(error => {
+          response.status(400).send({ error: 'Oh No'})
+      })
+
+    })
+
 })
 app.get('/info', (req, res) => {
     res.send(`
@@ -76,6 +127,7 @@ app.get('/info', (req, res) => {
 })
 
 app.get('/api/persons/:id', (req, res) => {
+    /*
     const id = Number(req.params.id);
     const henkilo = persons.find(x => x.id === id)
     if (henkilo) {
@@ -83,13 +135,45 @@ app.get('/api/persons/:id', (req, res) => {
     } else {
         res.status(404).end()
     }
+    */
+   Persons
+     .findById(req.params.id)
+     .then(response =>{
+         if(response){
+             res.json(format(response))
+         } else {
+             res.status(404).end()
+         }
+     })
+     .catch(error =>{
+         res.status(400).send({ error: 'ei löydy' })
+     })
 })
 
-app.delete('/api/delete/:id', (req, res) => {
-    const idd = Number(req.params.id)
+
+app.delete('/api/persons/:id', (req, res) => {
+    const idd = req.params.id
+    console.log('psass', idd)
+
+    Persons
+       .findByIdAndRemove(req.params.id)
+       .then(results => {
+           res.status(204).end()
+       })
+       .catch(error => {
+        response.status(400).send({ error: 'malformatted id' })
+       .find({})
+       .then(r => {
+           res.json(r.map(format))
+       }) 
+    })
+     
+       
+    /*
     persons = person.filter(x => x.id !== idd)
 
     res.status(204).end();
+    */
 })
 
 
